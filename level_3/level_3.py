@@ -1,67 +1,51 @@
 #!/usr/bin/python3
-"""
-Requests a N numbers of times
-"""
-
-import requests
-from bs4 import BeautifulSoup
+# 1024.py
+# Brennan D Baraban <375@holbertonschool.com>
+"""Hodor with my Holberton ID 1024 times."""
 import os
-try:
-    from PIL import Image
-except ImportError:
-    import Image
+import requests
 import pytesseract
+try:
+    import Image
+except ImportError:
+    from PIL import Image
+from bs4 import BeautifulSoup
 
-ID_user = "2814"
-num_request = 1024
-errors = 0
-request = 0
-ip = 'http://158.69.76.135'
-user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"
-current_request = 0
-URL = "http://158.69.76.135/level3.php"
+php = "http://158.69.76.135/level3.php"
+ip = "http://158.69.76.135"
+user_agent = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:64.0) "
+              "Gecko/20100101 Firefox/64.0")
 header = {
-    "user-Agent": user_agent,
-    "referer": URL
+    "User-Agent": user_agent,
+    "referer": php
 }
-payload = {
-            'id': ID_user,
-            'holdthedoor': 'Submit',
-            'key': '',
-            'captcha': ''
-            }
-for index in range(num_request):
-    session = requests.session()
-    page = session.get(URL, headers=header)
+vote = {
+    "id": "2814",
+    "holdthedoor": "Submit",
+    "key": "",
+    "captcha": ""
+}
 
-    soup = BeautifulSoup(page.text, "html.parser")
-    hidden_value = soup.find("form")
-    hidden_value = hidden_value.find("input", {"type": "hidden"})
-    hidden_value = hidden_value["value"]
-    payload["key"] = hidden_value
+if __name__ == "__main__":
+    count = 0
+    while count < 1024:
+        session = requests.session()
+        page = session.get(php, headers=header)
+        soup = BeautifulSoup(page.text, "html.parser")
 
-    captcha = soup.find("form", {"method": "post"}).find("img")
-    captcha = ip + captcha["src"]
-    captcha_img = open("captcha.png", "wb")
-    captcha_img.write(session.get(captcha).content)
-    captcha_img.close()
-    captcha_pass = pytesseract.image_to_string("captcha.png")
-    os.remove("captcha.png")
-    payload["captcha"] = cap
-    
+        hidden_value = soup.find("form", {"method": "post"})
+        hidden_value = hidden_value.find("input", {"type": "hidden"})
+        vote["key"] = hidden_value["value"]
 
+        captcha_path = soup.find("form", {"method": "post"}).find("img")
+        captcha_path = ip + captcha_path["src"]
+        captcha_img = open("captcha.png", "wb")
+        captcha_img.write(session.get(captcha_path).content)
+        captcha_img.close()
+        captcha_php = pytesseract.image_to_string("captcha.png")
+        os.remove("captcha.png")
+        vote["captcha"] = captcha_php
 
-    r = session.post(URL, headers=header, data=payload)
-    if r.status_code == 200:
-        print("Request accepted {}".format(request), end='\r')
-        request += 1
-    if r.status_code != 200:
-        print("failed request number {}".format(errors), end='\r')
-        errors += 1
-
-print()
-print()
-print("Resume:")
-print("Total requests {}".format(index + 1))
-print("succesful requests {}".format(request))
-print("failed requests {}".format(errors))
+        r = session.post(php, headers=header, data=vote)
+        if str(r.content) != "b'See you later hacker! [11]'":
+            count += 1
