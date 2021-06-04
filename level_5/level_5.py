@@ -16,12 +16,12 @@ ID_user = "2814"
 num_request = 1024
 errors = 0
 request = 0
-captcha_url = "http://158.69.76.135/captcha.php"
-ip = 'http://158.69.76.135'
+captcha_url = "http://158.69.76.135/tim.php"
+ip = 'http://158.69.76.135/level5.php'
 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"
 current_request = 0
 Cookies = 0
-URL = "http://158.69.76.135/level3.php"
+URL = "http://158.69.76.135/level5.php"
 header = {
     "Content-Type": 'application/x-www-form-urlencoded',
     "user-Agent": user_agent,
@@ -49,15 +49,16 @@ for index in range(num_request):
     captcha_img = open("captcha.png", "wb")
     captcha_img.write(captcha.content)
     captcha_img.close()
-    captcha_pass = pytesseract.image_to_string("captcha.png")
+    captcha_pass = pytesseract.image_to_string("captcha.png", config='--psm 10 --oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ-1234567890')
 
     new_captcha = ""
     br = 0
     for i in captcha_pass:
         new_captcha += i
         br += 1
-        if br == 4:
+        if br == 8:
             break
+    print(new_captcha)
     payload["captcha"] = new_captcha
 
 
