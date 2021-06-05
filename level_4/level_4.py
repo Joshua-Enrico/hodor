@@ -5,7 +5,7 @@ Requests a N numbers of times
 import requests
 from bs4 import BeautifulSoup
 
-ID_user = "3014"
+ID_user = "2814"
 num_request = 98
 errors = 0
 request = 0

@@ -6,11 +6,12 @@ Requests a N numbers of times
 import requests
 from bs4 import BeautifulSoup
 import os
-try:
-    from PIL import Image
-except ImportError:
-    import Image
+
+from PIL import Image
+
+import numpy as np
 import pytesseract
+import cv2
 
 ID_user = "2814"
 num_request = 1024
@@ -46,11 +47,26 @@ for index in range(num_request):
     Cookies = page.cookies
 
     captcha = session.get(captcha_url, headers=header)
-    captcha_img = open("captcha.png", "wb")
+    captcha_img = open("1.png", "wb")
     captcha_img.write(captcha.content)
-    captcha_img.close()
-    captcha_pass = pytesseract.image_to_string("captcha.png", config='--psm 10 --oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ-1234567890')
 
+    im = Image.open('1.png')
+    data = np.array(im)
+    
+    r1, g1, b1 = 0, 0, 0 # Original value
+    r2, g2, b2 = 128, 128, 128 # Value that we want to replace it with
+    
+    red, green, blue = data[:,:,0], data[:,:,1], data[:,:,2]
+    mask = (red == r1) & (green == g1) & (blue == b1)
+    data[:,:,:3][mask] = [r2, g2, b2]
+    
+    im = Image.fromarray(data)
+    im.save('3.png')
+
+
+    captcha_pass = pytesseract.image_to_string("3.png", config='--psm 10 --oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ-1234567890')
+
+    
     new_captcha = ""
     br = 0
     for i in captcha_pass:
